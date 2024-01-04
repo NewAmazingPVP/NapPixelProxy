@@ -46,4 +46,6 @@ public class PluginCommand extends Command {
             sender.sendMessage("This command can only be executed from the console.");
         }
     }
+
+
 }

@@ -27,7 +27,6 @@ import static newamazingpvp.nappixelproxy.AutoRestart.scheduleRestart;
 
 public class NapPixelProxy extends Plugin {
 
-    private LogHandler logHandler;
     private Configuration config;
     private static JDA jda;
     public static TextChannel channel;
@@ -40,8 +39,6 @@ public class NapPixelProxy extends Plugin {
         bg = this;
         saveDefaultConfig();
         loadConfiguration();
-        logHandler = new LogHandler();
-        ProxyServer.getInstance().getLogger().addHandler(logHandler);
         String token = config.getString("Discord.BotToken");
         String channelId = config.getString("Discord.Channel");
         EnumSet<GatewayIntent> allIntents = EnumSet.allOf(GatewayIntent.class);
@@ -71,28 +68,6 @@ public class NapPixelProxy extends Plugin {
 
     @Override
     public void onDisable() {
-        if (logHandler != null) {
-            ProxyServer.getInstance().getLogger().removeHandler(logHandler);
-        }
-    }
-
-    private class LogHandler extends Handler {
-        @Override
-        public void publish(LogRecord record) {
-            String message = record.getMessage();
-
-            if(intialized) {
-                sendDiscordMessage(message, "1135323447522771114");
-            }
-        }
-
-        @Override
-        public void flush() {
-        }
-
-        @Override
-        public void close() throws SecurityException {
-        }
     }
 
     private void saveDefaultConfig() {
@@ -115,6 +90,8 @@ public class NapPixelProxy extends Plugin {
             throw new RuntimeException(e);
         }
     }
+
+
     public static void sendDiscordMessage(String msg, String channelID) {
         if (channelID.isEmpty()) {
             // channel.sendMessage(msg);
@@ -146,8 +123,5 @@ public class NapPixelProxy extends Plugin {
             }
         }
     }
-
-
-
 
 }
