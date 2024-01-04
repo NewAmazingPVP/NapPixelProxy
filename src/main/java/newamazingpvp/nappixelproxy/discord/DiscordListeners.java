@@ -8,7 +8,7 @@ import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
-import org.json.JSONObject;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
@@ -62,8 +62,8 @@ public class DiscordListeners implements Listener {
                     String playerName = (String) dataObject.get("player");
 
                     System.out.println("Received message: " + message);
-                    System.out.println("Received intData: " + category);
-                    System.out.println("Received doubleData: " + playerName);
+                    System.out.println("Received category: " + category);
+                    System.out.println("Received playerName: " + playerName);
                 } catch (ParseException e) {
                     throw new RuntimeException(e);
                 }
