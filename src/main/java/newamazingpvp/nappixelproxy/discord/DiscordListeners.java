@@ -37,4 +37,6 @@ public class DiscordListeners implements Listener {
         sendDiscordEmbedPlayer(s, Color.RED, channelId, event.getPlayer().getName());
     }
 
+    @EventHandler
+    public void onLeave(ServerEven event) {
 }

@@ -25,7 +25,7 @@ public class MessageEvent extends ListenerAdapter {
 
         ChatColor discordColor = getChatColorFromDiscordColor(member != null ? member.getRoles().get(0).getColor().getRGB() : 0);
 
-        bg.getProxy().broadcast(ChatColor.AQUA + "[Discord | " + discordColor + highestRole + "] " + ChatColor.RESET + username + ": " + message);
+        bg.getProxy().broadcast(ChatColor.AQUA + "[Discord | " + "#" + Integer.toHexString(member.getRoles().get(0).getColor().getRGB()).substring(2) + highestRole + "] " + ChatColor.RESET + username + ": " + message);
     }
 
     private ChatColor getChatColorFromDiscordColor(int rgb) {
