@@ -6,7 +6,7 @@ import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-import static newamazingpvp.nappixelproxy.NapPixelProxy.bg;
+import static newamazingpvp.nappixelproxy.NapPixelProxy.proxy;
 
 
 public class AutoRestart {
@@ -38,11 +38,11 @@ public class AutoRestart {
             scheduleWarning(warningDelay, warningMessages[i]);
         }
 
-        ProxyServer.getInstance().getScheduler().schedule(bg, () -> restartServer(), initialDelay, TimeUnit.MILLISECONDS);
+        ProxyServer.getInstance().getScheduler().schedule(proxy, () -> restartServer(), initialDelay, TimeUnit.MILLISECONDS);
     }
 
     private static void scheduleWarning(long delay, String message) {
-        ProxyServer.getInstance().getScheduler().schedule(bg, () -> broadcastWarning(message), delay, TimeUnit.MILLISECONDS);
+        ProxyServer.getInstance().getScheduler().schedule(proxy, () -> broadcastWarning(message), delay, TimeUnit.MILLISECONDS);
     }
 
     private static void broadcastWarning(String message) {

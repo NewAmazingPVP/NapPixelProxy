@@ -30,13 +30,13 @@ public class NapPixelProxy extends Plugin {
     public static JDA jda;
     public static TextChannel channel;
     private static Map<String, String> discordMessageIds = new HashMap<>();
-    public static NapPixelProxy bg;
+    public static NapPixelProxy proxy;
     private boolean intialized = false;
 
     @Override
     public void onEnable() {
         getProxy().registerChannel("BungeeCord");
-        bg = this;
+        proxy = this;
         saveDefaultConfig();
         loadConfiguration();
         String token = config.getString("Discord.BotToken");

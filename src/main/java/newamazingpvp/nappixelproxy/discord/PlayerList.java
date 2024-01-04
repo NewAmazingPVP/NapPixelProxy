@@ -7,7 +7,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import java.util.ArrayList;
 import java.util.List;
 
-import static newamazingpvp.nappixelproxy.NapPixelProxy.bg;
+import static newamazingpvp.nappixelproxy.NapPixelProxy.proxy;
 
 public class PlayerList extends ListenerAdapter {
     @Override
@@ -21,7 +21,7 @@ public class PlayerList extends ListenerAdapter {
             List<String> playerNames = new ArrayList<>();
             int size = 0;
 
-            for (ProxiedPlayer p : bg.getProxy().getPlayers()) {
+            for (ProxiedPlayer p : proxy.getProxy().getPlayers()) {
                 playerNames.add(p.getName());
                 size++;
             }

@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.md_5.bungee.api.ChatColor;
 
-import static newamazingpvp.nappixelproxy.NapPixelProxy.bg;
+import static newamazingpvp.nappixelproxy.NapPixelProxy.proxy;
 import static newamazingpvp.nappixelproxy.discord.DiscordUtil.channelId;
 
 public class MessageEvent extends ListenerAdapter {
@@ -25,7 +25,7 @@ public class MessageEvent extends ListenerAdapter {
 
         ChatColor discordColor = getChatColorFromDiscordColor(member != null ? member.getRoles().get(0).getColor().getRGB() : 0);
 
-        bg.getProxy().broadcast(ChatColor.AQUA + "[Discord | " + "#" + Integer.toHexString(member.getRoles().get(0).getColor().getRGB()).substring(2) + highestRole + "] " + ChatColor.RESET + username + ": " + message);
+        proxy.getProxy().broadcast(ChatColor.AQUA + "[Discord | " + "#" + Integer.toHexString(member.getRoles().get(0).getColor().getRGB()).substring(2) + highestRole + "] " + ChatColor.RESET + username + ": " + message);
     }
 
     private ChatColor getChatColorFromDiscordColor(int rgb) {

@@ -50,23 +50,20 @@ public class DiscordListeners implements Listener {
             ByteArrayDataInput in = ByteStreams.newDataInput(event.getData());
             String channel = in.readUTF();
 
-            if (channel.equals("YourChannelName")) {
+            if (channel.equals("Server")) {
                 String jsonData = in.readUTF();
 
-                // Parse JSON data
                 JSONParser parser = new JSONParser();
                 try {
                     JSONObject dataObject = (JSONObject) parser.parse(jsonData);
 
-                    // Extract data based on key
                     String message = (String) dataObject.get("String");
                     String category = (String) dataObject.get("category");
                     String playerName = (String) dataObject.get("player");
 
-                    // Process the received data
                     System.out.println("Received message: " + message);
-                    getLogger().info("Received intData: " + intData);
-                    getLogger().info("Received doubleData: " + doubleData);
+                    System.out.println("Received intData: " + category);
+                    System.out.println("Received doubleData: " + playerName);
                 } catch (ParseException e) {
                     throw new RuntimeException(e);
                 }
