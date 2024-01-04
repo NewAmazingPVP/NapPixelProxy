@@ -1,0 +1,3 @@
+name: NapPixelProxy
+version: '${project.version}'
+main: newamazingpvp.nappixelproxy.NapPixelProxy
