@@ -35,6 +35,7 @@ public class NapPixelProxy extends Plugin {
 
     @Override
     public void onEnable() {
+        getProxy().registerChannel("BungeeCord");
         bg = this;
         saveDefaultConfig();
         loadConfiguration();

@@ -1,9 +1,16 @@
 package newamazingpvp.nappixelproxy.discord;
 
+import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteStreams;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+import net.md_5.bungee.event.EventPriority;
+import org.json.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.awt.*;
 
@@ -37,6 +44,33 @@ public class DiscordListeners implements Listener {
         sendDiscordEmbedPlayer(s, Color.RED, channelId, event.getPlayer().getName());
     }
 
-    @EventHandler
-    public void onLeave(ServerEven event) {
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPluginMessage(net.md_5.bungee.api.event.PluginMessageEvent event) {
+        if (event.getTag().equals("BungeeCord")) {
+            ByteArrayDataInput in = ByteStreams.newDataInput(event.getData());
+            String channel = in.readUTF();
+
+            if (channel.equals("YourChannelName")) {
+                String jsonData = in.readUTF();
+
+                // Parse JSON data
+                JSONParser parser = new JSONParser();
+                try {
+                    JSONObject dataObject = (JSONObject) parser.parse(jsonData);
+
+                    // Extract data based on key
+                    String message = (String) dataObject.get("String");
+                    String category = (String) dataObject.get("category");
+                    String playerName = (String) dataObject.get("player");
+
+                    // Process the received data
+                    System.out.println("Received message: " + message);
+                    getLogger().info("Received intData: " + intData);
+                    getLogger().info("Received doubleData: " + doubleData);
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
 }
