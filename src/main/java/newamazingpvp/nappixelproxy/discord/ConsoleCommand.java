@@ -1,17 +1,15 @@
-package newamazingpvp.nappixelproxy;
+package newamazingpvp.nappixelproxy.discord;
 
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-public class MessageListener extends ListenerAdapter {
+public class ConsoleCommand extends ListenerAdapter {
 
     private final Plugin plugin;
 
-    public MessageListener(Plugin plugin) {
+    public ConsoleCommand(Plugin plugin) {
         this.plugin = plugin;
     }
 

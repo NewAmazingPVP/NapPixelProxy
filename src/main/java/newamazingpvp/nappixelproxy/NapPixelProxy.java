@@ -10,6 +10,7 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
+import newamazingpvp.nappixelproxy.discord.ConsoleCommand;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,8 +20,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
 
 import static newamazingpvp.nappixelproxy.AutoRestart.scheduleRestart;
 
@@ -48,7 +47,7 @@ public class NapPixelProxy extends Plugin {
         jda = jdaBuilder.build();
         getProxy().getScheduler().schedule(this, () -> {
             channel = jda.getTextChannelById("1170146550274600960");
-            jda = jdaBuilder.addEventListeners(new MessageListener(this)).build();
+            jda = jdaBuilder.addEventListeners(new ConsoleCommand(this)).build();
             intialized = true;
         }, 5000, -1, TimeUnit.MILLISECONDS);
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new PluginCommand(this));

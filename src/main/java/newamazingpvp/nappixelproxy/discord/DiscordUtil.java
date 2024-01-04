@@ -1,4 +1,4 @@
-package newamazingpvp.nappixelproxy;
+package newamazingpvp.nappixelproxy.discord;
 
 import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.WebhookClientBuilder;
