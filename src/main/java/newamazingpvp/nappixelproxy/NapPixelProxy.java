@@ -27,8 +27,8 @@ import static newamazingpvp.nappixelproxy.AutoRestart.scheduleRestart;
 
 public class NapPixelProxy extends Plugin {
 
-    private Configuration config;
-    private static JDA jda;
+    public static Configuration config;
+    public static JDA jda;
     public static TextChannel channel;
     private static Map<String, String> discordMessageIds = new HashMap<>();
     public static NapPixelProxy bg;
