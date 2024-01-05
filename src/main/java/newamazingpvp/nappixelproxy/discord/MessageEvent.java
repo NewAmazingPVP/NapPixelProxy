@@ -23,14 +23,8 @@ public class MessageEvent extends ListenerAdapter {
 
         String highestRole = member != null ? member.getRoles().get(0).getName() : "No Role";
 
-        ChatColor discordColor = getChatColorFromDiscordColor(member != null ? member.getRoles().get(0).getColor().getRGB() : 0);
-
         proxy.getProxy().broadcast(ChatColor.AQUA + "[Discord | " + ChatColor.of("#" + Integer.toHexString(member.getRoles().get(0).getColor().getRGB()).substring(2)) + highestRole + "] " + ChatColor.RESET + username + ": " + message);
     }
 
-    private ChatColor getChatColorFromDiscordColor(int rgb) {
-        ChatColor[] colors = ChatColor.values();
-        return colors[Math.abs(rgb) % colors.length];
-    }
 
 }
