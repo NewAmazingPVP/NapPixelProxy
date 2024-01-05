@@ -8,7 +8,7 @@ import net.md_5.bungee.api.plugin.Plugin;
 
 import java.util.Collection;
 
-import static newamazingpvp.nappixelproxy.NapPixelProxy.sendDiscordMessage;
+import static newamazingpvp.nappixelproxy.discord.DiscordUtil.sendDiscordMessage;
 
 
 public class PluginCommand extends Command {

@@ -1,13 +1,14 @@
 # LifestealSMP config
-BotToken:
+Discord:
+  BotToken:
 
-Channel:
+  Channel:
 
-Webhook:
+  Webhook:
 
-ConsoleChannel:
+  ConsoleChannel:
 
-LoggingChannel:
+  LoggingChannel:
 
 Key:
 

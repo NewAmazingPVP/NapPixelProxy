@@ -26,7 +26,7 @@ public class Status extends ListenerAdapter {
                     channel.getManager().setTopic("Total Players online: " + num).queue();
                 }
             });
-        }, 0, 5, TimeUnit.MINUTES);
+        }, 1, 5, TimeUnit.MINUTES);
 
     }
 }
