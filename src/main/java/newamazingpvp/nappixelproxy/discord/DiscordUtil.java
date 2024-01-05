@@ -28,9 +28,9 @@ public class DiscordUtil {
     private static ScheduledTask initializing;
 
     public static void intializeBot() {
-        String token = config.getString("Discord.BotToken");
-        channelId = config.getString("Discord.Channel");
-        consoleChannelId = config.getString("Discord.ConsoleChannel");
+        String token = config.getString("BotToken");
+        channelId = String.valueOf(config.getLong("Channel"));
+        consoleChannelId = String.valueOf(config.getLong("ConsoleChannel"));
         EnumSet<GatewayIntent> allIntents = EnumSet.allOf(GatewayIntent.class);
 
         JDABuilder jdaBuilder = JDABuilder.createDefault(token);
@@ -125,7 +125,7 @@ public class DiscordUtil {
         }
     }
     public static void webHookClient(){
-        WebhookClientBuilder builder = new WebhookClientBuilder(config.getString("Discord.Webhook"));
+        WebhookClientBuilder builder = new WebhookClientBuilder(config.getString("Webhook"));
         builder.setThreadFactory((job) -> {
             Thread thread = new Thread(job);
             thread.setName("E");

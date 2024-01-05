@@ -23,8 +23,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static newamazingpvp.nappixelproxy.AutoRestart.scheduleRestart;
-import static newamazingpvp.nappixelproxy.discord.DiscordUtil.intializeBot;
-import static newamazingpvp.nappixelproxy.discord.DiscordUtil.jda;
+import static newamazingpvp.nappixelproxy.discord.DiscordUtil.*;
 
 
 public class NapPixelProxy extends Plugin {
@@ -39,6 +38,7 @@ public class NapPixelProxy extends Plugin {
         saveDefaultConfig();
         loadConfiguration();
         intializeBot();
+        webHookClient();
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new PluginCommand(this));
         ProxyServer.getInstance().getPluginManager().registerListener(this, new DiscordListeners());
         scheduleRestart();
