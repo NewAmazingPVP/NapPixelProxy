@@ -11,6 +11,7 @@ import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
 import newamazingpvp.nappixelproxy.discord.ConsoleCommand;
+import newamazingpvp.nappixelproxy.discord.DiscordListeners;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,16 +23,17 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static newamazingpvp.nappixelproxy.AutoRestart.scheduleRestart;
+import static newamazingpvp.nappixelproxy.discord.DiscordUtil.intializeBot;
+import static newamazingpvp.nappixelproxy.discord.DiscordUtil.jda;
 
 
 public class NapPixelProxy extends Plugin {
 
     public static Configuration config;
-    public static JDA jda;
+
     public static TextChannel channel;
     private static Map<String, String> discordMessageIds = new HashMap<>();
     public static NapPixelProxy proxy;
-    private boolean intialized = false;
 
     @Override
     public void onEnable() {
@@ -39,21 +41,12 @@ public class NapPixelProxy extends Plugin {
         proxy = this;
         saveDefaultConfig();
         loadConfiguration();
-        String token = config.getString("Discord.BotToken");
-        String channelId = config.getString("Discord.Channel");
-        EnumSet<GatewayIntent> allIntents = EnumSet.allOf(GatewayIntent.class);
-
-        JDABuilder jdaBuilder = JDABuilder.createDefault(token);
-        jdaBuilder.enableIntents(allIntents);
-        jda = jdaBuilder.build();
-        getProxy().getScheduler().schedule(this, () -> {
-            channel = jda.getTextChannelById("1170146550274600960");
-            jda = jdaBuilder.addEventListeners(new ConsoleCommand(this)).build();
-            intialized = true;
-        }, 5000, -1, TimeUnit.MILLISECONDS);
+        intializeBot();
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new PluginCommand(this));
+        ProxyServer.getInstance().getPluginManager().registerListener(this, new DiscordListeners());
         scheduleRestart();
-        ChannelLoggingHandler handler1 = new ChannelLoggingHandler(() -> jda.getTextChannelById("1135323447522771114"), config -> {
+        getProxy().getScheduler().schedule(this, () -> {
+        ChannelLoggingHandler handler1 = new ChannelLoggingHandler(() -> jda.getTextChannelById("1187946136124805180"), config -> {
             config.setColored(true);
             config.setSplitCodeBlockForLinks(false);
             config.setAllowLinkEmbeds(true);
@@ -64,6 +57,7 @@ public class NapPixelProxy extends Plugin {
             config.mapLoggerName("github.scarsz.discordsrv.dependencies.jda", s -> "DiscordSRV/JDA/" + s);
         }).attach().schedule();
         handler1.schedule();
+        }, 10, -1, TimeUnit.SECONDS);
     }
 
     @Override
@@ -93,6 +87,7 @@ public class NapPixelProxy extends Plugin {
 
 
     public static void sendDiscordMessage(String msg, String channelID) {
+        if(jda == null) return;
         if (channelID.isEmpty()) {
             // channel.sendMessage(msg);
         } else {

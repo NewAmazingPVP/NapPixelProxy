@@ -3,6 +3,7 @@ package newamazingpvp.nappixelproxy.discord;
 import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
+import com.google.common.math.Stats;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -12,14 +13,36 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.awt.*;
 import java.util.EnumSet;
+import java.util.concurrent.TimeUnit;
 
-import static newamazingpvp.nappixelproxy.NapPixelProxy.config;
-import static newamazingpvp.nappixelproxy.NapPixelProxy.jda;
+import static newamazingpvp.nappixelproxy.NapPixelProxy.*;
 
 public class DiscordUtil {
     public static TextChannel channel;
     public static WebhookClient client;
     public static String channelId;
+    public static JDA jda;
+
+    public static void intializeBot() {
+        String token = config.getString("BotToken");
+        channelId = config.getString("Channel");
+        EnumSet<GatewayIntent> allIntents = EnumSet.allOf(GatewayIntent.class);
+
+        JDABuilder jdaBuilder = JDABuilder.createDefault(token);
+        jdaBuilder.enableIntents(allIntents);
+        jda = jdaBuilder.build();
+        jda.addEventListener((new PlayerList()));
+        jda.addEventListener((new MessageEvent()));
+        jda.addEventListener((new Status()));
+        jda.addEventListener((new ConsoleCommand(proxy)));
+        jda.addEventListener((new IPClass()));
+        proxy.getProxy().getScheduler().schedule(proxy, () -> {
+            channel = jda.getTextChannelById(channelId);
+            sendDiscordEmbedTitle("Bot intialized", Color.MAGENTA, "");
+            sendDiscordMessage("The server has started✅", "");
+        }, 5000, -1, TimeUnit.MILLISECONDS);
+
+    }
 
     public static void sendDiscordMessage(String msg, String channelID) {
         if(jda == null)return;

@@ -8,8 +8,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import java.util.concurrent.TimeUnit;
 
 import static newamazingpvp.nappixelproxy.NapPixelProxy.proxy;
-import static newamazingpvp.nappixelproxy.NapPixelProxy.jda;
 import static newamazingpvp.nappixelproxy.discord.DiscordUtil.channelId;
+import static newamazingpvp.nappixelproxy.discord.DiscordUtil.jda;
 
 public class Status extends ListenerAdapter {
     @Override
