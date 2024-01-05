@@ -5,6 +5,7 @@ import com.google.common.io.ByteStreams;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.event.*;
+import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
@@ -32,7 +33,8 @@ public class DiscordListeners implements Listener {
 
     @EventHandler
     public void messageSent(ChatEvent event) {
-        if(!event.isCancelled()){
+        if(!event.isCancelled() && !event.isCommand() && !event.isProxyCommand()){
+            if(event.getMessage().isEmpty()) return;
             ProxiedPlayer player = (ProxiedPlayer) event.getSender();
             sendWebhook(player, event.getMessage(), player.getServer().getInfo().getName());
         }
@@ -49,21 +51,21 @@ public class DiscordListeners implements Listener {
         if (event.getTag().equals("BungeeCord")) {
             ByteArrayDataInput in = ByteStreams.newDataInput(event.getData());
             String channel = in.readUTF();
-
             if (channel.equals("Server")) {
                 String jsonData = in.readUTF();
-
                 JSONParser parser = new JSONParser();
                 try {
                     JSONObject dataObject = (JSONObject) parser.parse(jsonData);
-
-                    String message = (String) dataObject.get("String");
+                    System.out.println("json");
+                    String message = (String) dataObject.get("message");
                     String category = (String) dataObject.get("category");
-                    String playerName = (String) dataObject.get("player");
-
-                    System.out.println("Received message: " + message);
-                    System.out.println("Received category: " + category);
-                    System.out.println("Received playerName: " + playerName);
+                    String playerName = (String) dataObject.get("playerName");
+                    if(category.equals("death")){
+                        sendDiscordEmbedPlayer(message, Color.BLACK, channelId, playerName);
+                    }
+                    if(category.equals("advancement")){
+                        sendDiscordEmbedPlayer(message, Color.ORANGE, channelId, playerName);
+                    }
                 } catch (ParseException e) {
                     throw new RuntimeException(e);
                 }

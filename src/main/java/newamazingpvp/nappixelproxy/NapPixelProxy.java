@@ -41,6 +41,7 @@ public class NapPixelProxy extends Plugin {
         webHookClient();
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new PluginCommand(this));
         ProxyServer.getInstance().getPluginManager().registerListener(this, new DiscordListeners());
+        ProxyServer.getInstance().registerChannel("BungeeCord");
         scheduleRestart();
     }
 
