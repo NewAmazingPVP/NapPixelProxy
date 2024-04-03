@@ -15,6 +15,7 @@ import org.json.simple.parser.ParseException;
 
 import java.awt.*;
 
+import static newamazingpvp.nappixelproxy.NapPixelProxy.proxy;
 import static newamazingpvp.nappixelproxy.discord.DiscordUtil.*;
 
 public class DiscordListeners implements Listener {
@@ -31,14 +32,14 @@ public class DiscordListeners implements Listener {
         }
     }
 
-    @EventHandler
+    /*@EventHandler
     public void messageSent(ChatEvent event) {
         if(!event.isCancelled() && !event.isCommand() && !event.isProxyCommand()){
             if(event.getMessage().isEmpty()) return;
             ProxiedPlayer player = (ProxiedPlayer) event.getSender();
             sendWebhook(player, event.getMessage(), player.getServer().getInfo().getName());
         }
-    }
+    }*/
 
     @EventHandler
     public void onLeave(PlayerDisconnectEvent event) {
@@ -65,6 +66,9 @@ public class DiscordListeners implements Listener {
                     }
                     if(category.equals("advancement")){
                         sendDiscordEmbedPlayer(message, Color.ORANGE, channelId, playerName);
+                    }
+                    if(category.equals("chat")){
+                        sendWebhook(proxy.getProxy().getPlayer(playerName), message, proxy.getProxy().getPlayer(playerName).getServer().getInfo().getName());
                     }
                 } catch (ParseException e) {
                     throw new RuntimeException(e);
