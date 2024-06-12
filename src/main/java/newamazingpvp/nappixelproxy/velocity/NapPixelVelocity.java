@@ -91,6 +91,7 @@ public class NapPixelVelocity extends ListenerAdapter {
         JDABuilder jdaBuilder = JDABuilder.createDefault(token);
         jdaBuilder.enableIntents(allIntents);
         jda = jdaBuilder.build();
+        jda.addEventListener(this);
         task = proxy.getScheduler().buildTask(this, () -> {
             consoleChannel = jda.getTextChannelById(consoleChannelId);
             if (consoleChannel != null) {
