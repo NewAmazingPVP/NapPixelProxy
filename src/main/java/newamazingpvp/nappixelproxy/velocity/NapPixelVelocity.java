@@ -150,30 +150,11 @@ public class NapPixelVelocity extends ListenerAdapter {
     @Subscribe
     public void onPlayerKicked(KickedFromServerEvent event) {
         Player player = event.getPlayer();
-        RegisteredServer originalServer = event.getServer();
 
-        if (!originalServer.getServerInfo().getName().contains("limbo")) {
-            Optional<RegisteredServer> limboServer = proxy.getServer("limbo");
-            if (limboServer.isPresent()) {
-                event.setResult(KickedFromServerEvent.RedirectPlayer.create(limboServer.get(), Component.text("Server is restarting. Please wait...")));
-
-                if (!limboCooldown.contains(player.getUniqueId())) {
-                    if(player.getCurrentServer().isPresent() && player.getCurrentServer().get().getServer().getServerInfo().getName().equals(originalServer.getServerInfo().getName())){
-                        return;
-                    }
-                    keepPlayerInLimbo(player, limboServer.get());
-                    limboCooldown.add(player.getUniqueId());
-                    proxy.getScheduler().buildTask(this, () -> limboCooldown.remove(player.getUniqueId()))
-                            .delay(limboCooldownDuration.toMillis(), TimeUnit.MILLISECONDS)
-                            .schedule();
-                }
-
-                proxy.getScheduler().buildTask(this, () -> {
-                    if (isServerAvailable(originalServer)) {
-                        player.createConnectionRequest(originalServer).connect();
-                    }
-                }).delay(30, TimeUnit.SECONDS).schedule();
-            }
+        Optional<RegisteredServer> limboServer = proxy.getServer("limbo");
+        if (limboServer.isPresent()) {
+            event.setResult(KickedFromServerEvent.RedirectPlayer.create(event.getServer(), Component.text("Server is restarting. Please wait...")));
+            keepPlayerInLimbo(player, limboServer.get());
         }
     }
 
@@ -184,19 +165,19 @@ public class NapPixelVelocity extends ListenerAdapter {
 
     private void keepPlayerInLimbo(Player player, RegisteredServer limboServer) {
 
-            player.showTitle(Title.title(
+            /*player.showTitle(Title.title(
                     Component.text("Server Background Restarting")
                             .color(NamedTextColor.RED),
                     Component.text("Please stay connected...")
                             .color(NamedTextColor.YELLOW)
-            ));
+            ));*/
 
             player.sendActionBar(Component.text("Server background restarting. Please stay connected...")
                     .color(NamedTextColor.YELLOW));
 
-            player.sendMessage(Component.text("Server background restarting. Please stay connected...")
+           /* player.sendMessage(Component.text("Server background restarting. Please stay connected...")
                     .color(NamedTextColor.YELLOW));
-
+*/
 
     }
 }
