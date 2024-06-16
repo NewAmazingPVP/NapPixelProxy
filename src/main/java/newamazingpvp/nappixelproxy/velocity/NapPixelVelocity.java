@@ -17,6 +17,7 @@ import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import com.velocitypowered.api.scheduler.ScheduledTask;
+import com.velocitypowered.api.scheduler.Scheduler;
 import me.scarsz.jdaappender.ChannelLoggingHandler;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -56,6 +57,8 @@ public class NapPixelVelocity extends ListenerAdapter {
     public String consoleChannelId = "1135323447522771114";
     public ScheduledTask task;
     public MessageChannel consoleChannel;
+    private final Set<UUID> limboCooldown = ConcurrentHashMap.newKeySet();
+    private final Duration limboCooldownDuration = Duration.ofSeconds(5);
 
     @Inject
     public NapPixelVelocity(ProxyServer proxy, @DataDirectory Path dataDirectory) {
@@ -147,13 +150,34 @@ public class NapPixelVelocity extends ListenerAdapter {
     @Subscribe
     public void onPlayerKicked(KickedFromServerEvent event) {
         Player player = event.getPlayer();
+        RegisteredServer originalServer = event.getServer();
 
-        Optional<RegisteredServer> limboServer = proxy.getServer("limbo");
-        if (limboServer.isPresent()) {
-            event.setResult(KickedFromServerEvent.RedirectPlayer.create(limboServer.get(), Component.text("Server is restarting. Please wait...")));
-            keepPlayerInLimbo(player, limboServer.get());
+        if (!originalServer.getServerInfo().getName().contains("limbo")) {
+            Optional<RegisteredServer> limboServer = proxy.getServer("limbo");
+            if (limboServer.isPresent()) {
+                event.setResult(KickedFromServerEvent.RedirectPlayer.create(limboServer.get(), Component.text("Server is restarting. Please wait...")));
+
+                if (!limboCooldown.contains(player.getUniqueId())) {
+                    keepPlayerInLimbo(player, limboServer.get());
+                    limboCooldown.add(player.getUniqueId());
+                    proxy.getScheduler().buildTask(this, () -> limboCooldown.remove(player.getUniqueId()))
+                            .delay(limboCooldownDuration.toMillis(), TimeUnit.MILLISECONDS)
+                            .schedule();
+                }
+
+                proxy.getScheduler().buildTask(this, () -> {
+                    if (isServerAvailable(originalServer)) {
+                        player.createConnectionRequest(originalServer).connect();
+                    }
+                }).delay(30, TimeUnit.SECONDS).schedule();
+            }
         }
     }
+
+    private boolean isServerAvailable(RegisteredServer server) {
+        return proxy.getServer(server.getServerInfo().getName()).isPresent();
+    }
+
 
 
     private void keepPlayerInLimbo(Player player, RegisteredServer limboServer) {
