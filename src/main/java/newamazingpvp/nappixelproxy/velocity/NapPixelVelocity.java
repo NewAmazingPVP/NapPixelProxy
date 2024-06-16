@@ -158,6 +158,9 @@ public class NapPixelVelocity extends ListenerAdapter {
                 event.setResult(KickedFromServerEvent.RedirectPlayer.create(limboServer.get(), Component.text("Server is restarting. Please wait...")));
 
                 if (!limboCooldown.contains(player.getUniqueId())) {
+                    if(player.getCurrentServer().isPresent() && player.getCurrentServer().get().getServer().getServerInfo().getName().equals(originalServer.getServerInfo().getName())){
+                        return;
+                    }
                     keepPlayerInLimbo(player, limboServer.get());
                     limboCooldown.add(player.getUniqueId());
                     proxy.getScheduler().buildTask(this, () -> limboCooldown.remove(player.getUniqueId()))
@@ -179,9 +182,8 @@ public class NapPixelVelocity extends ListenerAdapter {
     }
 
 
-
     private void keepPlayerInLimbo(Player player, RegisteredServer limboServer) {
-        proxy.getScheduler().buildTask(this, () -> {
+
             player.showTitle(Title.title(
                     Component.text("Server Background Restarting")
                             .color(NamedTextColor.RED),
@@ -195,6 +197,6 @@ public class NapPixelVelocity extends ListenerAdapter {
             player.sendMessage(Component.text("Server background restarting. Please stay connected...")
                     .color(NamedTextColor.YELLOW));
 
-        }).repeat(10, TimeUnit.SECONDS).schedule();
+
     }
 }
