@@ -77,7 +77,7 @@ public class NapPixelVelocity extends ListenerAdapter {
         config = loadConfig(dataDirectory);
         initializeVelocityBot();
         AutoRestart.scheduleRestart(proxy, this);
-        createLimboServer();
+        //createLimboServer();
     }
 
     private Toml loadConfig(Path path) {
@@ -151,19 +151,22 @@ public class NapPixelVelocity extends ListenerAdapter {
     public void onPlayerKicked(KickedFromServerEvent event) {
         Player player = event.getPlayer();
 
-        Optional<RegisteredServer> limboServer = proxy.getServer("limbo");
-        if (limboServer.isPresent()) {
-            event.setResult(KickedFromServerEvent.RedirectPlayer.create(event.getServer(), Component.text("Server is restarting. Please wait...")));
-            keepPlayerInLimbo(player, limboServer.get());
-        }
+        //Optional<RegisteredServer> limboServer = proxy.getServer("limbo");
+        //if (limboServer.isPresent()) {
+        event.setResult(KickedFromServerEvent.RedirectPlayer.create(event.getServer(), Component.text("Server is restarting. Please wait...")));
+        keepPlayerInLimbo(player);
+        //}
     }
+
+
+
 
     private boolean isServerAvailable(RegisteredServer server) {
         return proxy.getServer(server.getServerInfo().getName()).isPresent();
     }
 
 
-    private void keepPlayerInLimbo(Player player, RegisteredServer limboServer) {
+    private void keepPlayerInLimbo(Player player) {
 
             /*player.showTitle(Title.title(
                     Component.text("Server Background Restarting")
