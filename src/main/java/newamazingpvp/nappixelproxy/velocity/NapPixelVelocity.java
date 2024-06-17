@@ -39,6 +39,7 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Plugin(id = "nappixelproxy", name = "NapPixelProxy", authors = "NewAmazingPVP")
 public class NapPixelVelocity extends ListenerAdapter {
@@ -154,7 +155,7 @@ public class NapPixelVelocity extends ListenerAdapter {
         //Optional<RegisteredServer> limboServer = proxy.getServer("limbo");
         //if (limboServer.isPresent()) {
         event.setResult(KickedFromServerEvent.RedirectPlayer.create(event.getServer(), Component.text("Server is restarting. Please wait...")));
-        keepPlayerInLimbo(player);
+        keepPlayerInLimbo(player, event.getServer());
         //}
     }
 
@@ -166,7 +167,7 @@ public class NapPixelVelocity extends ListenerAdapter {
     }
 
 
-    private void keepPlayerInLimbo(Player player) {
+    private void keepPlayerInLimbo(Player player, RegisteredServer server) {
 
             /*player.showTitle(Title.title(
                     Component.text("Server Background Restarting")
@@ -174,9 +175,25 @@ public class NapPixelVelocity extends ListenerAdapter {
                     Component.text("Please stay connected...")
                             .color(NamedTextColor.YELLOW)
             ));*/
+        AtomicReference<ScheduledTask> taskReference = new AtomicReference<>();
 
+        ScheduledTask task = proxy.getScheduler().buildTask(this, () -> {
             player.sendActionBar(Component.text("Server background restarting. Please stay connected...")
                     .color(NamedTextColor.YELLOW));
+
+            if (player.getCurrentServer().isPresent() && player.getCurrentServer().get().getServer().equals(server)) {
+
+                proxy.getScheduler().buildTask(this, () -> {
+
+                    ScheduledTask scheduledTask = taskReference.get();
+                    if (scheduledTask != null) {
+                        scheduledTask.cancel();
+                    }
+                }).delay(Duration.ofSeconds(15)).schedule();
+            }
+        }).delay(Duration.ofSeconds(1)).repeat(Duration.ofSeconds(1)).schedule();
+
+        taskReference.set(task);
 
            /* player.sendMessage(Component.text("Server background restarting. Please stay connected...")
                     .color(NamedTextColor.YELLOW));
