@@ -62,6 +62,7 @@ public class NapPixelVelocity extends ListenerAdapter {
     public MessageChannel consoleChannel;
     private final Set<UUID> limboCooldown = ConcurrentHashMap.newKeySet();
     private final Duration limboCooldownDuration = Duration.ofSeconds(5);
+    private final Map<UUID, ScheduledTask> actionBarTasks = new ConcurrentHashMap<>();
 
     @Inject
     public NapPixelVelocity(ProxyServer proxy, @DataDirectory Path dataDirectory) {
@@ -174,19 +175,21 @@ public class NapPixelVelocity extends ListenerAdapter {
 
 
     private void keepPlayerInLimbo(Player player, RegisteredServer server) {
-
+        UUID playerId = player.getUniqueId();
             /*player.showTitle(Title.title(
                     Component.text("Server Background Restarting")
                             .color(NamedTextColor.RED),
                     Component.text("Please stay connected...")
                             .color(NamedTextColor.YELLOW)
             ));*/
+        if (actionBarTasks.containsKey(playerId)) {
+            return;
+        }
         AtomicReference<ScheduledTask> taskReference = new AtomicReference<>();
 
         ScheduledTask task = proxy.getScheduler().buildTask(this, () -> {
             player.sendActionBar(Component.text("Server background restarting. Please stay connected...")
                     .color(NamedTextColor.YELLOW));
-
             if (player.getCurrentServer().isPresent() && player.getCurrentServer().get().getServer().equals(server)) {
 
                 proxy.getScheduler().buildTask(this, () -> {
@@ -194,12 +197,14 @@ public class NapPixelVelocity extends ListenerAdapter {
                     ScheduledTask scheduledTask = taskReference.get();
                     if (scheduledTask != null) {
                         scheduledTask.cancel();
+                        actionBarTasks.remove(playerId);
                     }
                 }).delay(Duration.ofSeconds(1)).schedule();
             }
         }).delay(Duration.ofSeconds(1)).repeat(Duration.ofSeconds(1)).schedule();
 
         taskReference.set(task);
+        actionBarTasks.put(playerId, task);
 
            /* player.sendMessage(Component.text("Server background restarting. Please stay connected...")
                     .color(NamedTextColor.YELLOW));
