@@ -27,8 +27,10 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.title.Title;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -151,10 +153,14 @@ public class NapPixelVelocity extends ListenerAdapter {
     @Subscribe
     public void onPlayerKicked(KickedFromServerEvent event) {
         Player player = event.getPlayer();
-
+        if(event.getServerKickReason().isPresent()){
+            if(event.getServerKickReason().get().toString().contains("ban") || event.getServerKickReason().get().toString().contains("hack")){
+                return;
+            }
+        }
         //Optional<RegisteredServer> limboServer = proxy.getServer("limbo");
         //if (limboServer.isPresent()) {
-        event.setResult(KickedFromServerEvent.RedirectPlayer.create(event.getServer(), Component.text("Server is restarting. Please wait...")));
+        event.setResult(KickedFromServerEvent.RedirectPlayer.create(event.getServer(), Component.text("Server has successfully restarted. Join https://discord.gg/ckmNKnMMaX for help!").color(NamedTextColor.GREEN)));
         keepPlayerInLimbo(player, event.getServer());
         //}
     }
@@ -189,7 +195,7 @@ public class NapPixelVelocity extends ListenerAdapter {
                     if (scheduledTask != null) {
                         scheduledTask.cancel();
                     }
-                }).delay(Duration.ofSeconds(15)).schedule();
+                }).delay(Duration.ofSeconds(1)).schedule();
             }
         }).delay(Duration.ofSeconds(1)).repeat(Duration.ofSeconds(1)).schedule();
 
