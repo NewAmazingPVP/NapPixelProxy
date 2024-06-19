@@ -2,6 +2,9 @@ package newamazingpvp.nappixelproxy.velocity;
 
 import com.google.inject.Inject;
 import com.moandjiezana.toml.Toml;
+import com.velocitypowered.api.command.Command;
+import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
@@ -14,6 +17,8 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.ServerConnection;
+import com.velocitypowered.api.proxy.messages.ChannelIdentifier;
+import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import com.velocitypowered.api.scheduler.ScheduledTask;
@@ -63,6 +68,7 @@ public class NapPixelVelocity extends ListenerAdapter {
     private final Set<UUID> limboCooldown = ConcurrentHashMap.newKeySet();
     private final Duration limboCooldownDuration = Duration.ofSeconds(5);
     private final Map<UUID, ScheduledTask> actionBarTasks = new ConcurrentHashMap<>();
+    private final ChannelIdentifier channel = MinecraftChannelIdentifier.create("nappixel", "lifesteal");
 
     @Inject
     public NapPixelVelocity(ProxyServer proxy, @DataDirectory Path dataDirectory) {
@@ -70,8 +76,23 @@ public class NapPixelVelocity extends ListenerAdapter {
         this.proxy = proxy;
         this.dataDirectory = dataDirectory;
         config = loadConfig(dataDirectory);
+        proxy.getCommandManager().register(
+                proxy.getCommandManager().metaBuilder("kickall")
+                        .aliases("ka")
+                        .build(),
+                (SimpleCommand) invocation -> kickAllPlayers()
+        );
     }
-
+    private void kickAllPlayers() {
+        /*for (Player player : proxy.getAllPlayers()) {
+            player.disconnect(Component.text("The server is restarting. Please rejoin later.")
+                    .color(NamedTextColor.RED));
+        }*/
+        String s = ";p";
+        proxy.getServer("smp").ifPresent(serverConnection ->
+                serverConnection.sendPluginMessage(channel, s.getBytes())
+        );
+    }
     public static NapPixelVelocity getInstance() {
         return instance;
     }
@@ -142,16 +163,18 @@ public class NapPixelVelocity extends ListenerAdapter {
         String bungeeChannelId = "1135323447522771114";
         if (event.getMessage().getChannelId().equals(bungeeChannelId)) {
             String messageContent = event.getMessage().getContentRaw();
-            proxy.getCommandManager().executeImmediatelyAsync(proxy.getConsoleCommandSource(), messageContent);
+            if(messageContent.contains("shutdown") || messageContent.contains("end")){
+                kickAllPlayers();
+            }
+            proxy.getScheduler().buildTask(this, () -> {
+                proxy.getCommandManager().executeImmediatelyAsync(proxy.getConsoleCommandSource(), messageContent);
+            }).delay(1, TimeUnit.SECONDS).schedule();
+
         }
     }
 
-    private void createLimboServer() {
-        ServerInfo limboServerInfo = new ServerInfo("limbo", new InetSocketAddress("0.0.0.0", 14144));
-        proxy.registerServer(limboServerInfo);
-    }
 
-    @Subscribe
+    /*@Subscribe
     public void onPlayerKicked(KickedFromServerEvent event) {
         Player player = event.getPlayer();
         if(event.getServerKickReason().isPresent()){
@@ -164,7 +187,7 @@ public class NapPixelVelocity extends ListenerAdapter {
         event.setResult(KickedFromServerEvent.RedirectPlayer.create(event.getServer(), Component.text("Server has successfully restarted. Join https://discord.gg/ckmNKnMMaX for help!").color(NamedTextColor.GREEN)));
         keepPlayerInLimbo(player, event.getServer());
         //}
-    }
+    }*/
 
 
 
