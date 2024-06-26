@@ -87,12 +87,6 @@ public class NapPixelVelocity extends ListenerAdapter {
         loadIpPlayerMappings();
         loadWhitelist();
         proxy.getCommandManager().register(
-                proxy.getCommandManager().metaBuilder("kickall")
-                        .aliases("ka")
-                        .build(),
-                (SimpleCommand) invocation -> kickAllPlayers()
-        );
-        proxy.getCommandManager().register(
                 proxy.getCommandManager().metaBuilder("whitelist")
                         .aliases("wl")
                         .build(),
@@ -291,6 +285,10 @@ public class NapPixelVelocity extends ListenerAdapter {
     }
 
     private class WhitelistCommand implements SimpleCommand {
+        @Override
+        public boolean hasPermission(final Invocation invocation) {
+            return invocation.source().hasPermission("lifesteal.admin");
+        }
         @Override
         public void execute(Invocation invocation) {
             String[] args = invocation.arguments();
