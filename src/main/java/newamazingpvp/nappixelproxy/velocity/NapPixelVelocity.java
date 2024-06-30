@@ -84,14 +84,14 @@ public class NapPixelVelocity extends ListenerAdapter {
         this.dataDirectory = dataDirectory;
         ipPlayerMappingFile = dataDirectory.resolve("ip_player_mapping.json");
         config = loadConfig(dataDirectory);
-        loadIpPlayerMappings();
-        loadWhitelist();
-        proxy.getCommandManager().register(
+        //loadIpPlayerMappings();
+        //loadWhitelist();
+        /*proxy.getCommandManager().register(
                 proxy.getCommandManager().metaBuilder("whitelist")
                         .aliases("wl")
                         .build(),
                 new WhitelistCommand()
-        );
+        );*/
     }
 
     private void kickAllPlayers() {
@@ -163,6 +163,8 @@ public class NapPixelVelocity extends ListenerAdapter {
                 task.cancel();
             }
         }).delay(Duration.ofSeconds(1)).repeat(Duration.ofSeconds(1)).schedule();
+
+
     }
 
     @Override
@@ -210,7 +212,7 @@ public class NapPixelVelocity extends ListenerAdapter {
 
     @Subscribe(order = PostOrder.FIRST)
     public void onServerPreConnect(ServerPreConnectEvent event) {
-        Player player = event.getPlayer();
+        /*Player player = event.getPlayer();
         String playerIp = player.getRemoteAddress().getAddress().getHostAddress();
         loadWhitelist();
         if (whitelist.contains(player.getUsername().toLowerCase())) {
@@ -224,7 +226,7 @@ public class NapPixelVelocity extends ListenerAdapter {
         } else {
             ipToPlayerMap.put(playerIp, player.getUniqueId());
             saveIpPlayerMappings();
-        }
+        }*/
     }
 
     private void loadIpPlayerMappings() {
@@ -284,7 +286,7 @@ public class NapPixelVelocity extends ListenerAdapter {
         }
     }
 
-    private class WhitelistCommand implements SimpleCommand {
+    /*private class WhitelistCommand implements SimpleCommand {
         @Override
         public boolean hasPermission(final Invocation invocation) {
             return invocation.source().hasPermission("lifesteal.admin");
@@ -312,5 +314,5 @@ public class NapPixelVelocity extends ListenerAdapter {
                 invocation.source().sendMessage(Component.text("Usage: /whitelist <add|remove> <username>"));
             }
         }
-    }
+    }*/
 }
