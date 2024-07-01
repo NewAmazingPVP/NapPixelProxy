@@ -151,7 +151,7 @@ public class NapPixelVelocity extends ListenerAdapter {
                     config.setAllowLinkEmbeds(true);
                     config.addFilter(logItem -> {
                         String message = logItem.getMessage();
-                        return !message.contains("unable to connect");
+                        return message.contains("unable to connect");
                     });
                     config.mapLoggerName("net.dv8tion.jda", "JDA");
                     config.mapLoggerName("net.minecraft.server.MinecraftServer", "Server");
