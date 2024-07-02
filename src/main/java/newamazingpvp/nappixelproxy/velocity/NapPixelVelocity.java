@@ -29,6 +29,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.io.*;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -38,6 +39,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -211,9 +213,12 @@ public class NapPixelVelocity extends ListenerAdapter {
     }
 
     @Subscribe(order = PostOrder.FIRST)
-    public void onServerPreConnect(ServerPreConnectEvent event) {
+    public void onServerPreConnect(ServerPreConnectEvent event) throws IOException {
         Player player = event.getPlayer();
         String playerIp = player.getRemoteAddress().getAddress().getHostAddress();
+        if(isVpnOrProxy(playerIp)){
+            player.disconnect(Component.text("VPN/Proxy not allowed!").color(NamedTextColor.DARK_RED));
+        }
         loadWhitelist();
         if (whitelist.contains(player.getUsername().toLowerCase())) {
             return;
@@ -271,6 +276,18 @@ public class NapPixelVelocity extends ListenerAdapter {
             logger.error("Error loading whitelist.txt", e);
         }
     }
+    private boolean isVpnOrProxy(String ip) throws IOException {
+        String url = "https://proxycheck.io/v2/{IP}?key=PROXYCHECK_KEY&risk=1&vpn=1".replace("{IP}", ip);
+
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(new URL(url).openStream()))) {
+            String response = in.lines().collect(Collectors.joining()).toLowerCase();
+            if (response.contains("yes") || response.contains("vpn")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     private void saveWhitelist() {
         try {
