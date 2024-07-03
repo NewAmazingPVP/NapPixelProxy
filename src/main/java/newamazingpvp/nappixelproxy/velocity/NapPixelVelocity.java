@@ -216,12 +216,12 @@ public class NapPixelVelocity extends ListenerAdapter {
     public void onServerPreConnect(ServerPreConnectEvent event) throws IOException {
         Player player = event.getPlayer();
         String playerIp = player.getRemoteAddress().getAddress().getHostAddress();
-        if(isVpnOrProxy(playerIp)){
-            player.disconnect(Component.text("VPN/Proxy not allowed!").color(NamedTextColor.DARK_RED));
-        }
         loadWhitelist();
         if (whitelist.contains(player.getUsername().toLowerCase())) {
             return;
+        }
+        if(isVpnOrProxy(playerIp)){
+            player.disconnect(Component.text("VPN/Proxy not allowed!").color(NamedTextColor.DARK_RED));
         }
 
         UUID existingPlayer = ipToPlayerMap.get(playerIp);
