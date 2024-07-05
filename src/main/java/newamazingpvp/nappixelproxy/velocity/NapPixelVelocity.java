@@ -223,7 +223,7 @@ public class NapPixelVelocity extends ListenerAdapter {
         if(isVpnOrProxy(playerIp)){
             player.disconnect(Component.text("VPN/Proxy not allowed!").color(NamedTextColor.DARK_RED));
         }
-
+        loadIpPlayerMappings();
         UUID existingPlayer = ipToPlayerMap.get(playerIp);
         if (existingPlayer != null && !existingPlayer.equals(player.getUniqueId())) {
             player.disconnect(Component.text("Only one account per IP address is allowed.").color(NamedTextColor.RED));
@@ -241,6 +241,7 @@ public class NapPixelVelocity extends ListenerAdapter {
                 Type type = new TypeToken<Map<String, UUID>>() {}.getType();
                 Map<String, UUID> loadedMap = gson.fromJson(reader, type);
                 if (loadedMap != null) {
+                    ipToPlayerMap.clear();
                     ipToPlayerMap.putAll(loadedMap);
                 }
             } catch (IOException e) {
