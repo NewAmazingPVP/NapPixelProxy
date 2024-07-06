@@ -221,7 +221,8 @@ public class NapPixelVelocity extends ListenerAdapter {
             return;
         }
         if(isVpnOrProxy(playerIp)){
-            player.disconnect(Component.text("VPN/Proxy not allowed!").color(NamedTextColor.DARK_RED));
+            ///Proxy
+            player.disconnect(Component.text("VPNnot allowed!").color(NamedTextColor.DARK_RED));
         }
         loadIpPlayerMappings();
         UUID existingPlayer = ipToPlayerMap.get(playerIp);
@@ -282,7 +283,8 @@ public class NapPixelVelocity extends ListenerAdapter {
 
         try (BufferedReader in = new BufferedReader(new InputStreamReader(new URL(url).openStream()))) {
             String response = in.lines().collect(Collectors.joining()).toLowerCase();
-            if (response.contains("yes") || response.contains("vpn")) {
+            //response.contains("yes") ||
+            if (response.contains("vpn")) {
                 return true;
             }
         }
