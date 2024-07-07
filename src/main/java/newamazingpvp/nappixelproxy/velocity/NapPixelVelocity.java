@@ -75,6 +75,7 @@ public class NapPixelVelocity extends ListenerAdapter {
     private final Path ipPlayerMappingFile;
     private final Logger logger;
     private Set<String> whitelist;
+    private Set<String> blacklist; // New
     private final Map<String, UUID> ipToPlayerMap = new ConcurrentHashMap<>();
 
     @Inject
@@ -83,16 +84,24 @@ public class NapPixelVelocity extends ListenerAdapter {
         this.proxy = proxy;
         this.logger = logger;
         this.whitelist = new HashSet<>();
+        this.blacklist = new HashSet<>(); // New
         this.dataDirectory = dataDirectory;
         ipPlayerMappingFile = dataDirectory.resolve("ip_player_mapping.json");
         config = loadConfig(dataDirectory);
         loadIpPlayerMappings();
         loadWhitelist();
+        loadBlacklist(); // New
         proxy.getCommandManager().register(
                 proxy.getCommandManager().metaBuilder("whitelist")
                         .aliases("wl")
                         .build(),
                 new WhitelistCommand()
+        );
+        proxy.getCommandManager().register(
+                proxy.getCommandManager().metaBuilder("blacklist") // New
+                        .aliases("bl") // New
+                        .build(),
+                new BlacklistCommand() // New
         );
     }
 
@@ -165,8 +174,6 @@ public class NapPixelVelocity extends ListenerAdapter {
                 task.cancel();
             }
         }).delay(Duration.ofSeconds(1)).repeat(Duration.ofSeconds(1)).schedule();
-
-
     }
 
     @Override
@@ -217,12 +224,16 @@ public class NapPixelVelocity extends ListenerAdapter {
         Player player = event.getPlayer();
         String playerIp = player.getRemoteAddress().getAddress().getHostAddress();
         loadWhitelist();
+        loadBlacklist(); // New
         if (whitelist.contains(player.getUsername().toLowerCase())) {
             return;
         }
-        if(isVpnOrProxy(playerIp)){
-            ///Proxy
-            player.disconnect(Component.text("VPNnot allowed!").color(NamedTextColor.DARK_RED));
+        if (blacklist.contains(player.getUsername().toLowerCase())) { // New
+            player.disconnect(Component.text("You are blacklisted from this server.").color(NamedTextColor.DARK_RED));
+            return;
+        }
+        if (isVpnOrProxy(playerIp)){
+            player.disconnect(Component.text("VPN not allowed!").color(NamedTextColor.DARK_RED));
         }
         loadIpPlayerMappings();
         UUID existingPlayer = ipToPlayerMap.get(playerIp);
@@ -262,7 +273,7 @@ public class NapPixelVelocity extends ListenerAdapter {
 
     private void loadWhitelist() {
         try {
-            Path whitelistPath = new File( dataDirectory+"/whitelist.txt").toPath();
+            Path whitelistPath = new File(dataDirectory + "/whitelist.txt").toPath();
             Files.createDirectories(whitelistPath.getParent());
             if (!Files.exists(whitelistPath)) {
                 Files.createFile(whitelistPath);
@@ -278,6 +289,54 @@ public class NapPixelVelocity extends ListenerAdapter {
             logger.error("Error loading whitelist.txt", e);
         }
     }
+
+    private void loadBlacklist() {
+        try {
+            Path blacklistPath = new File(dataDirectory + "/blacklist.yml").toPath();
+            Files.createDirectories(blacklistPath.getParent());
+            if (!Files.exists(blacklistPath)) {
+                Files.createFile(blacklistPath);
+            }
+
+            try (BufferedReader reader = new BufferedReader(new FileReader(blacklistPath.toFile()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    blacklist.add(line.trim().toLowerCase());
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error loading blacklist.yml", e);
+        }
+    }
+
+    private void saveWhitelist() {
+        try {
+            Path whitelistPath = new File(dataDirectory + "/whitelist.txt").toPath();
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(whitelistPath.toFile()))) {
+                for (String username : whitelist) {
+                    writer.write(username);
+                    writer.newLine();
+                }
+            }
+        } catch (IOException e) {
+            logger.error("Error saving whitelist.txt", e);
+        }
+    }
+
+    private void saveBlacklist() {
+        try {
+            Path blacklistPath = new File(dataDirectory + "/blacklist.yml").toPath();
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(blacklistPath.toFile()))) {
+                for (String username : blacklist) {
+                    writer.write(username);
+                    writer.newLine();
+                }
+            }
+        } catch (IOException e) {
+            logger.error("Error saving blacklist.yml", e);
+        }
+    }
+
     private boolean isVpnOrProxy(String ip) throws IOException {
         String url = "https://proxycheck.io/v2/{IP}?key=PROXYCHECK_KEY&risk=1&vpn=1".replace("{IP}", ip);
 
@@ -289,21 +348,6 @@ public class NapPixelVelocity extends ListenerAdapter {
             }
         }
         return false;
-    }
-
-
-    private void saveWhitelist() {
-        try {
-            Path whitelistPath = new File(dataDirectory+"/whitelist.txt").toPath();
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(whitelistPath.toFile()))) {
-                for (String username : whitelist) {
-                    writer.write(username);
-                    writer.newLine();
-                }
-            }
-        } catch (IOException e) {
-            logger.error("Error saving whitelist.txt", e);
-        }
     }
 
     private class WhitelistCommand implements SimpleCommand {
@@ -332,6 +376,36 @@ public class NapPixelVelocity extends ListenerAdapter {
                 invocation.source().sendMessage(Component.text("Removed " + username + " from the whitelist."));
             } else {
                 invocation.source().sendMessage(Component.text("Usage: /whitelist <add|remove> <username>"));
+            }
+        }
+    }
+
+    private class BlacklistCommand implements SimpleCommand { // New
+        @Override
+        public boolean hasPermission(final Invocation invocation) {
+            return invocation.source().hasPermission("lifesteal.admin");
+        }
+        @Override
+        public void execute(Invocation invocation) {
+            String[] args = invocation.arguments();
+            if (args.length < 2) {
+                invocation.source().sendMessage(Component.text("Usage: /blacklist <add|remove> <username>"));
+                return;
+            }
+
+            String action = args[0].toLowerCase();
+            String username = args[1].toLowerCase();
+
+            if ("add".equals(action)) {
+                blacklist.add(username);
+                saveBlacklist();
+                invocation.source().sendMessage(Component.text("Added " + username + " to the blacklist."));
+            } else if ("remove".equals(action)) {
+                blacklist.remove(username);
+                saveBlacklist();
+                invocation.source().sendMessage(Component.text("Removed " + username + " from the blacklist."));
+            } else {
+                invocation.source().sendMessage(Component.text("Usage: /blacklist <add|remove> <username>"));
             }
         }
     }
