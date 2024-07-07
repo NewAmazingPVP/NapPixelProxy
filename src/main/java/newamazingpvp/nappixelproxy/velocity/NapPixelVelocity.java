@@ -75,7 +75,7 @@ public class NapPixelVelocity extends ListenerAdapter {
     private final Path ipPlayerMappingFile;
     private final Logger logger;
     private Set<String> whitelist;
-    private Set<String> blacklist; // New
+    private Set<String> blacklist;
     private final Map<String, UUID> ipToPlayerMap = new ConcurrentHashMap<>();
 
     @Inject
@@ -84,13 +84,13 @@ public class NapPixelVelocity extends ListenerAdapter {
         this.proxy = proxy;
         this.logger = logger;
         this.whitelist = new HashSet<>();
-        this.blacklist = new HashSet<>(); // New
+        this.blacklist = new HashSet<>();
         this.dataDirectory = dataDirectory;
         ipPlayerMappingFile = dataDirectory.resolve("ip_player_mapping.json");
         config = loadConfig(dataDirectory);
         loadIpPlayerMappings();
         loadWhitelist();
-        loadBlacklist(); // New
+        loadBlacklist();
         proxy.getCommandManager().register(
                 proxy.getCommandManager().metaBuilder("whitelist")
                         .aliases("wl")
@@ -98,10 +98,10 @@ public class NapPixelVelocity extends ListenerAdapter {
                 new WhitelistCommand()
         );
         proxy.getCommandManager().register(
-                proxy.getCommandManager().metaBuilder("blacklist") // New
-                        .aliases("bl") // New
+                proxy.getCommandManager().metaBuilder("blacklist")
+                        .aliases("bl")
                         .build(),
-                new BlacklistCommand() // New
+                new BlacklistCommand()
         );
     }
 
@@ -224,15 +224,16 @@ public class NapPixelVelocity extends ListenerAdapter {
         Player player = event.getPlayer();
         String playerIp = player.getRemoteAddress().getAddress().getHostAddress();
         loadWhitelist();
-        loadBlacklist(); // New
+        loadBlacklist();
         if (whitelist.contains(player.getUsername().toLowerCase())) {
             return;
         }
-        if (blacklist.contains(player.getUsername().toLowerCase())) { // New
+        if (blacklist.contains(player.getUsername().toLowerCase())) {
             player.disconnect(Component.text("You are blacklisted from this server.").color(NamedTextColor.DARK_RED));
             return;
         }
         if (isVpnOrProxy(playerIp)){
+            //proxy btw
             player.disconnect(Component.text("VPN not allowed!").color(NamedTextColor.DARK_RED));
         }
         loadIpPlayerMappings();
@@ -380,7 +381,7 @@ public class NapPixelVelocity extends ListenerAdapter {
         }
     }
 
-    private class BlacklistCommand implements SimpleCommand { // New
+    private class BlacklistCommand implements SimpleCommand {
         @Override
         public boolean hasPermission(final Invocation invocation) {
             return invocation.source().hasPermission("lifesteal.admin");
