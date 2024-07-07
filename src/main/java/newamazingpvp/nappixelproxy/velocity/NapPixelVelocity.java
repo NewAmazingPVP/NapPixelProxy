@@ -292,7 +292,7 @@ public class NapPixelVelocity extends ListenerAdapter {
 
     private void loadBlacklist() {
         try {
-            Path blacklistPath = new File(dataDirectory + "/blacklist.yml").toPath();
+            Path blacklistPath = new File(dataDirectory + "/blacklist.txt").toPath();
             Files.createDirectories(blacklistPath.getParent());
             if (!Files.exists(blacklistPath)) {
                 Files.createFile(blacklistPath);
@@ -305,7 +305,7 @@ public class NapPixelVelocity extends ListenerAdapter {
                 }
             }
         } catch (Exception e) {
-            logger.error("Error loading blacklist.yml", e);
+            logger.error("Error loading blacklist.txt", e);
         }
     }
 
@@ -325,7 +325,7 @@ public class NapPixelVelocity extends ListenerAdapter {
 
     private void saveBlacklist() {
         try {
-            Path blacklistPath = new File(dataDirectory + "/blacklist.yml").toPath();
+            Path blacklistPath = new File(dataDirectory + "/blacklist.txt").toPath();
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(blacklistPath.toFile()))) {
                 for (String username : blacklist) {
                     writer.write(username);
@@ -333,7 +333,7 @@ public class NapPixelVelocity extends ListenerAdapter {
                 }
             }
         } catch (IOException e) {
-            logger.error("Error saving blacklist.yml", e);
+            logger.error("Error saving blacklist.txt", e);
         }
     }
 
