@@ -106,7 +106,7 @@ public class NapPixelVelocity extends ListenerAdapter {
     }
 
     private void kickAllPlayers() {
-        String s = ";p";
+        String s = "forceRestart";
         proxy.getServer("smp").ifPresent(serverConnection ->
                 serverConnection.sendPluginMessage(channel, s.getBytes())
         );
@@ -232,10 +232,10 @@ public class NapPixelVelocity extends ListenerAdapter {
             player.disconnect(Component.text("You are blacklisted from this server.").color(NamedTextColor.DARK_RED));
             return;
         }
-        if (isVpnOrProxy(playerIp)){
+        /*if (isVpnOrProxy(playerIp)){
             //proxy btw
             player.disconnect(Component.text("VPN not allowed!").color(NamedTextColor.DARK_RED));
-        }
+        }*/
         loadIpPlayerMappings();
         UUID existingPlayer = ipToPlayerMap.get(playerIp);
         if (existingPlayer != null && !existingPlayer.equals(player.getUniqueId())) {
