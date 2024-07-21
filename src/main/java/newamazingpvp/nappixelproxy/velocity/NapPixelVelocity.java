@@ -1,5 +1,7 @@
 package newamazingpvp.nappixelproxy.velocity;
 
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;
 import com.moandjiezana.toml.Toml;
 import com.velocitypowered.api.command.CommandSource;
@@ -70,7 +72,7 @@ public class NapPixelVelocity extends ListenerAdapter {
     private final Set<UUID> limboCooldown = ConcurrentHashMap.newKeySet();
     private final Duration limboCooldownDuration = Duration.ofSeconds(5);
     private final Map<UUID, ScheduledTask> actionBarTasks = new ConcurrentHashMap<>();
-    private final ChannelIdentifier channel = MinecraftChannelIdentifier.create("nappixel", "lifesteal");
+    public static final MinecraftChannelIdentifier IDENTIFIER = MinecraftChannelIdentifier.from("nappixel:lifesteal");
 
     private final Path ipPlayerMappingFile;
     private final Logger logger;
@@ -105,11 +107,34 @@ public class NapPixelVelocity extends ListenerAdapter {
         );
     }
 
-    private void kickAllPlayers() {
-        String s = "forceRestart";
-        proxy.getServer("smp").ifPresent(serverConnection ->
-                serverConnection.sendPluginMessage(channel, s.getBytes())
-        );
+    private void kickAllPlayers() throws IOException {
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF("forceRestart");
+
+
+        ByteArrayOutputStream msgbytes = new ByteArrayOutputStream();
+        DataOutputStream msgout = new DataOutputStream(msgbytes);
+        msgout.writeUTF("forceRestartLOL");
+        msgout.writeShort(42);
+
+        out.writeShort(msgbytes.toByteArray().length);
+        out.write(msgbytes.toByteArray());
+
+        Optional<RegisteredServer> optionalServer = proxy.getServer("smp");
+        if( proxy.getServer("smp").isPresent()){
+            RegisteredServer server = optionalServer.get();
+            sendPluginMessageToBackend(server, IDENTIFIER, out.toByteArray());
+        }
+
+
+        /*proxy.getServer("smp").ifPresent(serverConnection ->
+                serverConnection.sendPluginMessage(IDENTIFIER, out.toByteArray())
+        );*/
+    }
+
+    public boolean sendPluginMessageToBackend(RegisteredServer server, ChannelIdentifier identifier, byte[] data) {
+        // On success, returns true
+        return server.sendPluginMessage(identifier, data);
     }
 
     public static NapPixelVelocity getInstance() {
@@ -121,6 +146,7 @@ public class NapPixelVelocity extends ListenerAdapter {
         config = loadConfig(dataDirectory);
         initializeVelocityBot();
         AutoRestart.scheduleRestart(proxy, this);
+        proxy.getChannelRegistrar().register(IDENTIFIER);
     }
 
     private Toml loadConfig(Path path) {
@@ -182,7 +208,11 @@ public class NapPixelVelocity extends ListenerAdapter {
         if (event.getMessage().getChannelId().equals(bungeeChannelId)) {
             String messageContent = event.getMessage().getContentRaw();
             if (messageContent.contains("shutdown") || messageContent.contains("end")) {
-                kickAllPlayers();
+                try {
+                    kickAllPlayers();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
             proxy.getScheduler().buildTask(this, () -> {
                 proxy.getCommandManager().executeImmediatelyAsync(proxy.getConsoleCommandSource(), messageContent);
