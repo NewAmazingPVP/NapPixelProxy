@@ -207,7 +207,8 @@ public class NapPixelVelocity extends ListenerAdapter {
         String bungeeChannelId = "1135323447522771114";
         if (event.getMessage().getChannelId().equals(bungeeChannelId)) {
             String messageContent = event.getMessage().getContentRaw();
-            if (messageContent.contains("shutdown") || messageContent.contains("end")) {
+            if(event.getAuthor().isBot()) return;
+            if (messageContent.equalsIgnoreCase("shutdown") || messageContent.equalsIgnoreCase("end")) {
                 try {
                     kickAllPlayers();
                 } catch (IOException e) {
