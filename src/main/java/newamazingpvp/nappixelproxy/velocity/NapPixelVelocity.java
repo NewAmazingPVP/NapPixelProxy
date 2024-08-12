@@ -270,7 +270,7 @@ public class NapPixelVelocity extends ListenerAdapter {
         loadIpPlayerMappings();
         UUID existingPlayer = ipToPlayerMap.get(playerIp);
         if (existingPlayer != null && !existingPlayer.equals(player.getUniqueId())) {
-            player.disconnect(Component.text("Only one account per IP address is allowed.").color(NamedTextColor.RED));
+            player.disconnect(Component.text("Only one account per IP address is allowed. If you have siblings, please make an appeal in the #appeals channel in Discord (https://discord.gg/PN8egFY3ap with IGN and a reason to whitelist.").color(NamedTextColor.RED));
             event.setResult(ServerPreConnectEvent.ServerResult.denied());
         } else {
             ipToPlayerMap.put(playerIp, player.getUniqueId());
