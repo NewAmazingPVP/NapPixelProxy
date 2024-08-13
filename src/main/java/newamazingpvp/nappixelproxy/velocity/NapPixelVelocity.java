@@ -23,6 +23,7 @@ import com.velocitypowered.api.scheduler.Scheduler;
 import me.scarsz.jdaappender.ChannelLoggingHandler;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -69,6 +70,7 @@ public class NapPixelVelocity extends ListenerAdapter {
     public String consoleChannelId = "1135323447522771114";
     public ScheduledTask task;
     public MessageChannel consoleChannel;
+    public MessageChannel channel;
     private final Set<UUID> limboCooldown = ConcurrentHashMap.newKeySet();
     private final Duration limboCooldownDuration = Duration.ofSeconds(5);
     private final Map<UUID, ScheduledTask> actionBarTasks = new ConcurrentHashMap<>();
@@ -181,7 +183,8 @@ public class NapPixelVelocity extends ListenerAdapter {
         jda.addEventListener(this);
         task = proxy.getScheduler().buildTask(this, () -> {
             consoleChannel = jda.getTextChannelById(consoleChannelId);
-            if (consoleChannel != null) {
+            channel = jda.getTextChannelById("1136353329488875531");
+            if (consoleChannel != null && channel != null) {
                 ChannelLoggingHandler handler1 = new ChannelLoggingHandler(() -> consoleChannel, config -> {
                     config.setColored(true);
                     config.setSplitCodeBlockForLinks(false);
@@ -263,21 +266,39 @@ public class NapPixelVelocity extends ListenerAdapter {
             player.disconnect(Component.text("You are blacklisted from this server.").color(NamedTextColor.DARK_RED));
             return;
         }
-        /*if (isVpnOrProxy(playerIp)){
+        if (isVpn(playerIp)){
             //proxy btw
-            player.disconnect(Component.text("VPN not allowed!").color(NamedTextColor.DARK_RED));
-        }*/
+            //player.disconnect(Component.text("VPN not allowed!").color(NamedTextColor.DARK_RED));
+            sendDiscordMessage(player.getUsername() + " might be using VPN to bypass ban or for alts", "");
+        }
+        if (isProxy(playerIp)){
+            //proxy btw
+            //player.disconnect(Component.text("VPN not allowed!").color(NamedTextColor.DARK_RED));
+            sendDiscordMessage(player.getUsername() + " might be using Proxy to bypass ban or for alts", "");
+        }
         loadIpPlayerMappings();
         UUID existingPlayer = ipToPlayerMap.get(playerIp);
         if (existingPlayer != null && !existingPlayer.equals(player.getUniqueId())) {
-            player.disconnect(Component.text("Only one account per IP address is allowed. If you have siblings, please make an appeal in the #appeals channel in Discord (https://discord.gg/PN8egFY3ap with IGN and a reason to whitelist.").color(NamedTextColor.RED));
-            event.setResult(ServerPreConnectEvent.ServerResult.denied());
+            //player.disconnect(Component.text("Only one account per IP address is allowed. If you have siblings, please make an appeal in the #appeals channel in Discord (https://discord.gg/PN8egFY3ap with IGN and a reason to whitelist.").color(NamedTextColor.RED));
+            //event.setResult(ServerPreConnectEvent.ServerResult.denied());
+            sendDiscordMessage(player.getUsername() + " might possibly using an alt since they have duplicate same IP accounts", "");
         } else {
             ipToPlayerMap.put(playerIp, player.getUniqueId());
             saveIpPlayerMappings();
         }
     }
 
+    public void sendDiscordMessage(String msg, String channelID) {
+        if (jda == null) return;
+        if (channelID.isEmpty()) {
+            channel.sendMessage(msg);
+        } else {
+            TextChannel tempChannel = jda.getTextChannelById(channelID);
+            if (tempChannel != null) {
+                tempChannel.sendMessage(msg).queue();
+            }
+        }
+    }
     private void loadIpPlayerMappings() {
         if (Files.exists(ipPlayerMappingFile)) {
             try (BufferedReader reader = Files.newBufferedReader(ipPlayerMappingFile)) {
@@ -369,13 +390,26 @@ public class NapPixelVelocity extends ListenerAdapter {
         }
     }
 
-    private boolean isVpnOrProxy(String ip) throws IOException {
+    private boolean isVpn(String ip) throws IOException {
         String url = "https://proxycheck.io/v2/{IP}?key=PROXYCHECK_KEY&risk=1&vpn=1".replace("{IP}", ip);
 
         try (BufferedReader in = new BufferedReader(new InputStreamReader(new URL(url).openStream()))) {
             String response = in.lines().collect(Collectors.joining()).toLowerCase();
             //response.contains("yes") ||
             if (response.contains("vpn")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isProxy(String ip) throws IOException {
+        String url = "https://proxycheck.io/v2/{IP}?key=PROXYCHECK_KEY&risk=1&vpn=1".replace("{IP}", ip);
+
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(new URL(url).openStream()))) {
+            String response = in.lines().collect(Collectors.joining()).toLowerCase();
+            //response.contains("vpn") ||
+            if (response.contains("yes")) {
                 return true;
             }
         }
