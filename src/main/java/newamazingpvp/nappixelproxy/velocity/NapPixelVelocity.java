@@ -70,7 +70,6 @@ public class NapPixelVelocity extends ListenerAdapter {
     public String consoleChannelId = "1135323447522771114";
     public ScheduledTask task;
     public MessageChannel consoleChannel;
-    public MessageChannel channel;
     private final Set<UUID> limboCooldown = ConcurrentHashMap.newKeySet();
     private final Duration limboCooldownDuration = Duration.ofSeconds(5);
     private final Map<UUID, ScheduledTask> actionBarTasks = new ConcurrentHashMap<>();
@@ -183,8 +182,7 @@ public class NapPixelVelocity extends ListenerAdapter {
         jda.addEventListener(this);
         task = proxy.getScheduler().buildTask(this, () -> {
             consoleChannel = jda.getTextChannelById(consoleChannelId);
-            channel = jda.getTextChannelById("1136353329488875531");
-            if (consoleChannel != null && channel != null) {
+            if (consoleChannel != null) {
                 ChannelLoggingHandler handler1 = new ChannelLoggingHandler(() -> consoleChannel, config -> {
                     config.setColored(true);
                     config.setSplitCodeBlockForLinks(false);
@@ -269,12 +267,12 @@ public class NapPixelVelocity extends ListenerAdapter {
         if (isVpn(playerIp)){
             //proxy btw
             //player.disconnect(Component.text("VPN not allowed!").color(NamedTextColor.DARK_RED));
-            sendDiscordMessage(player.getUsername() + " might be using VPN to bypass ban or for alts", "");
+            sendDiscordMessage(player.getUsername() + " might be using VPN to bypass ban or for alts", "1136353329488875531");
         }
         if (isProxy(playerIp)){
             //proxy btw
             //player.disconnect(Component.text("VPN not allowed!").color(NamedTextColor.DARK_RED));
-            sendDiscordMessage(player.getUsername() + " might be using Proxy to bypass ban or for alts", "");
+            sendDiscordMessage(player.getUsername() + " might be using Proxy to bypass ban or for alts", "1136353329488875531");
         }
         loadIpPlayerMappings();
         UUID existingPlayer = ipToPlayerMap.get(playerIp);
@@ -291,7 +289,7 @@ public class NapPixelVelocity extends ListenerAdapter {
     public void sendDiscordMessage(String msg, String channelID) {
         if (jda == null) return;
         if (channelID.isEmpty()) {
-            channel.sendMessage(msg);
+            //channel.sendMessage(msg);
         } else {
             TextChannel tempChannel = jda.getTextChannelById(channelID);
             if (tempChannel != null) {
