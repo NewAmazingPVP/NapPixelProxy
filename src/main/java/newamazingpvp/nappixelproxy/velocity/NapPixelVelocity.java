@@ -279,7 +279,7 @@ public class NapPixelVelocity extends ListenerAdapter {
         if (existingPlayer != null && !existingPlayer.equals(player.getUniqueId())) {
             //player.disconnect(Component.text("Only one account per IP address is allowed. If you have siblings, please make an appeal in the #appeals channel in Discord (https://discord.gg/PN8egFY3ap with IGN and a reason to whitelist.").color(NamedTextColor.RED));
             //event.setResult(ServerPreConnectEvent.ServerResult.denied());
-            sendDiscordMessage(player.getUsername() + " might possibly using an alt since they have duplicate same IP accounts", "1136353329488875531");
+            sendDiscordMessage(player.getUsername() + " might possibly be using an alt since they have duplicate same IP accounts with " + existingPlayer + " https://mcprofile.io/endpoints", "1136353329488875531");
         } else {
             ipToPlayerMap.put(playerIp, player.getUniqueId());
             saveIpPlayerMappings();
