@@ -268,11 +268,17 @@ public class NapPixelVelocity extends ListenerAdapter {
             //proxy btw
             //player.disconnect(Component.text("VPN not allowed!").color(NamedTextColor.DARK_RED));
             sendDiscordMessage(player.getUsername() + " might be using VPN to bypass ban or for alts", "1136353329488875531");
+            proxy.getScheduler().buildTask(this, () -> {
+                player.sendMessage( Component.text("You are using a VPN, and admins see that and might potentially get you banned if found alting."));
+            }).delay(Duration.ofSeconds(2)).schedule();
         }
         if (isProxy(playerIp)){
             //proxy btw
             //player.disconnect(Component.text("VPN not allowed!").color(NamedTextColor.DARK_RED));
             sendDiscordMessage(player.getUsername() + " might be using Proxy to bypass ban or for alts", "1136353329488875531");
+            proxy.getScheduler().buildTask(this, () -> {
+                player.sendMessage( Component.text("You are using a proxy, and admins see that and might potentially get you banned if found alting."));
+            }).delay(Duration.ofSeconds(2)).schedule();
         }
         loadIpPlayerMappings();
         UUID existingPlayer = ipToPlayerMap.get(playerIp);
@@ -280,6 +286,9 @@ public class NapPixelVelocity extends ListenerAdapter {
             //player.disconnect(Component.text("Only one account per IP address is allowed. If you have siblings, please make an appeal in the #appeals channel in Discord (https://discord.gg/PN8egFY3ap with IGN and a reason to whitelist.").color(NamedTextColor.RED));
             //event.setResult(ServerPreConnectEvent.ServerResult.denied());
             sendDiscordMessage(player.getUsername() + " might possibly be using an alt since they have duplicate same IP accounts with " + existingPlayer + " https://mcprofile.io/endpoints", "1136353329488875531");
+            proxy.getScheduler().buildTask(this, () -> {
+                player.sendMessage( Component.text("You are using an alt, and admins see that and might potentially get you banned."));
+            }).delay(Duration.ofSeconds(2)).schedule();
         } else {
             ipToPlayerMap.put(playerIp, player.getUniqueId());
             saveIpPlayerMappings();
