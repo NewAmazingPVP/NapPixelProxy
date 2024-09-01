@@ -2,6 +2,8 @@ package newamazingpvp.nappixelproxy.velocity;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.inject.Inject;
 import com.moandjiezana.toml.Toml;
 import com.velocitypowered.api.command.CommandSource;
@@ -32,6 +34,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -79,6 +82,7 @@ public class NapPixelVelocity extends ListenerAdapter {
     private final Logger logger;
     private Set<String> whitelist;
     private Set<String> blacklist;
+    private static final String BASE_URL = "https://mcprofile.io/api/v1/";
     private final Map<String, UUID> ipToPlayerMap = new ConcurrentHashMap<>();
 
     @Inject
@@ -268,16 +272,18 @@ public class NapPixelVelocity extends ListenerAdapter {
             //proxy btw
             //player.disconnect(Component.text("VPN not allowed!").color(NamedTextColor.DARK_RED));
             sendDiscordMessage(player.getUsername() + " might be using VPN to bypass ban or for alts", "1136353329488875531");
+            proxy.sendMessage(Component.text(player.getUsername() + " might be using VPN to bypass ban or for alts. Let admins know if you suspect this").color(NamedTextColor.DARK_RED));
             proxy.getScheduler().buildTask(this, () -> {
-                player.sendMessage( Component.text("You are using a VPN, and admins see that and might potentially get you banned if found alting."));
+                player.sendMessage( Component.text("You are using a VPN, and admins see that and might potentially get you banned if found alting. If you have a valid reason why, make a appeal in #appeals channel on discord to get verified Proxy").color(NamedTextColor.RED));
             }).delay(Duration.ofSeconds(2)).schedule();
         }
         if (isProxy(playerIp)){
             //proxy btw
             //player.disconnect(Component.text("VPN not allowed!").color(NamedTextColor.DARK_RED));
             sendDiscordMessage(player.getUsername() + " might be using Proxy to bypass ban or for alts", "1136353329488875531");
+            proxy.sendMessage(Component.text(player.getUsername() + " might be using Proxy to bypass ban or for alts. Let admins know if you suspect this").color(NamedTextColor.DARK_RED));
             proxy.getScheduler().buildTask(this, () -> {
-                player.sendMessage( Component.text("You are using a proxy, and admins see that and might potentially get you banned if found alting."));
+                player.sendMessage( Component.text("You are using a proxy, and admins see that and might potentially get you banned if found alting. If you have a valid reason why, make a appeal in #appeals channel on discord to get verified VPN").color(NamedTextColor.RED));
             }).delay(Duration.ofSeconds(2)).schedule();
         }
         loadIpPlayerMappings();
@@ -285,9 +291,10 @@ public class NapPixelVelocity extends ListenerAdapter {
         if (existingPlayer != null && !existingPlayer.equals(player.getUniqueId())) {
             //player.disconnect(Component.text("Only one account per IP address is allowed. If you have siblings, please make an appeal in the #appeals channel in Discord (https://discord.gg/PN8egFY3ap with IGN and a reason to whitelist.").color(NamedTextColor.RED));
             //event.setResult(ServerPreConnectEvent.ServerResult.denied());
-            sendDiscordMessage(player.getUsername() + " might possibly be using an alt since they have duplicate same IP accounts with " + existingPlayer + " https://mcprofile.io/endpoints", "1136353329488875531");
+            sendDiscordMessage(player.getUsername() + " might possibly be using an alt since they have duplicate same IP accounts with " + getUsernameFromUUID(existingPlayer), "1136353329488875531");
+            proxy.sendMessage(Component.text("Player " + player.getUsername() + " might possibly be using an alt since they have duplicate same IP accounts with " + getUsernameFromUUID(existingPlayer) + ". Let admins know if you suspect this").color(NamedTextColor.DARK_RED));
             proxy.getScheduler().buildTask(this, () -> {
-                player.sendMessage( Component.text("You are using an alt, and admins see that and might potentially get you banned."));
+                player.sendMessage( Component.text("You are using an alt, and admins see that and might potentially get you banned. If you have a valid reason why, make a appeal in #appeals channel on discord to get verified alt").color(NamedTextColor.RED));
             }).delay(Duration.ofSeconds(2)).schedule();
         } else {
             ipToPlayerMap.put(playerIp, player.getUniqueId());
@@ -408,6 +415,43 @@ public class NapPixelVelocity extends ListenerAdapter {
             }
         }
         return false;
+    }
+
+    public boolean isBedrockUUID(UUID uuid) {
+        return uuid.toString().startsWith("00000000-0000-0000");
+    }
+
+    public String getUsernameFromUUID(UUID uuid) {
+        try {
+            String urlString;
+
+            if (isBedrockUUID(uuid)) {
+                urlString = BASE_URL + "bedrock/fuid/" + uuid;
+            } else {
+                urlString = BASE_URL + "java/uuid/" + uuid;
+            }
+
+            URL url = new URL(urlString);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0");
+            connection.setRequestProperty("x-api-key", config.getString("APIKey"));
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                InputStreamReader reader = new InputStreamReader(connection.getInputStream());
+                JsonObject jsonResponse = JsonParser.parseReader(reader).getAsJsonObject();
+
+                if (isBedrockUUID(uuid)) {
+                    return jsonResponse.has("gamertag") ? jsonResponse.get("gamertag").getAsString() : null;
+                } else {
+                    return jsonResponse.has("java_name") ? jsonResponse.get("java_name").getAsString() : null;
+                }
+            } else {
+            }
+        } catch (Exception e) {
+        }
+        return uuid.toString();
     }
 
     private boolean isProxy(String ip) throws IOException {
