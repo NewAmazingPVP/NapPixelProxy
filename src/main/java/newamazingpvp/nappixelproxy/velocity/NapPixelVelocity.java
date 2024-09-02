@@ -445,7 +445,7 @@ public class NapPixelVelocity extends ListenerAdapter {
                 if (isBedrockUUID(uuid)) {
                     return jsonResponse.has("gamertag") ? jsonResponse.get("gamertag").getAsString() : null;
                 } else {
-                    return jsonResponse.has("java_name") ? jsonResponse.get("java_name").getAsString() : null;
+                    return jsonResponse.has("username") ? jsonResponse.get("username").getAsString() : null;
                 }
             } else {
             }
