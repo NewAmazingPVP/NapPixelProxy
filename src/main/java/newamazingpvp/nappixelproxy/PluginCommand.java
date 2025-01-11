@@ -1,7 +1,6 @@
 package newamazingpvp.nappixelproxy;
 
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -22,7 +21,7 @@ public class PluginCommand extends Command {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if ( !(sender instanceof ProxiedPlayer)) {
+        if (!(sender instanceof ProxiedPlayer)) {
             Collection<Plugin> plugins = plugin.getProxy().getPluginManager().getPlugins();
             sender.sendMessage("Loaded plugins:");
             for (Plugin loadedPlugin : plugins) {

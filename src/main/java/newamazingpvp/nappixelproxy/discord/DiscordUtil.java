@@ -16,7 +16,8 @@ import java.awt.*;
 import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
 
-import static newamazingpvp.nappixelproxy.NapPixelProxy.*;
+import static newamazingpvp.nappixelproxy.NapPixelProxy.config;
+import static newamazingpvp.nappixelproxy.NapPixelProxy.proxy;
 
 public class DiscordUtil {
     public static TextChannel channel;
@@ -67,7 +68,7 @@ public class DiscordUtil {
     }
 
     public static void sendDiscordMessage(String msg, String channelID) {
-        if(jda == null)return;
+        if (jda == null) return;
         if (channelID.isEmpty() && channel != null) {
             channel.sendMessage(msg);
         } else {
@@ -79,11 +80,11 @@ public class DiscordUtil {
     }
 
     public static void sendDiscordEmbedTitle(String msg, Color c, String channelID) {
-        if(jda == null)return;
+        if (jda == null) return;
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle(msg);
         eb.setColor(c);
-        if (channelID.isEmpty() && channel != null){
+        if (channelID.isEmpty() && channel != null) {
             channel.sendMessageEmbeds(eb.build()).queue();
         } else {
             TextChannel tempChannel = jda.getTextChannelById(channelID);
@@ -94,7 +95,7 @@ public class DiscordUtil {
     }
 
     public static void sendDiscordEmbedStats(String msg, Color c, String channelID, String name) {
-        if(jda == null)return;
+        if (jda == null) return;
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle(msg);
         eb.setColor(c);
@@ -110,7 +111,7 @@ public class DiscordUtil {
     }
 
     public static void sendDiscordEmbedPlayer(String msg, Color c, String channelID, String p) {
-        if(jda == null)return;
+        if (jda == null) return;
         p = "https://minotar.net/helm/" + p;
         EmbedBuilder eb = new EmbedBuilder();
         eb.setAuthor(msg, "https://shop.nappixel.tk/", p);
@@ -124,7 +125,8 @@ public class DiscordUtil {
             }
         }
     }
-    public static void webHookClient(){
+
+    public static void webHookClient() {
         WebhookClientBuilder builder = new WebhookClientBuilder(config.getString("Webhook"));
         builder.setThreadFactory((job) -> {
             Thread thread = new Thread(job);
@@ -136,10 +138,10 @@ public class DiscordUtil {
         client = builder.build();
     }
 
-    public static void sendWebhook(ProxiedPlayer p, String msg, String server){
+    public static void sendWebhook(ProxiedPlayer p, String msg, String server) {
         String avatar = "https://minotar.net/helm/" + p.getName();
         WebhookMessageBuilder builder = new WebhookMessageBuilder();
-        builder.setUsername("[" + server + "] " +p.getName());
+        builder.setUsername("[" + server + "] " + p.getName());
         builder.setAvatarUrl(avatar);
         builder.setContent(msg);
         client.send(builder.build());

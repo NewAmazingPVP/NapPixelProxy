@@ -23,10 +23,9 @@ public class MessageEvent extends ListenerAdapter {
 
         String highestRole = member != null ? member.getRoles().get(0).getName() : "No Role";
         ChatColor rolecolor;
-        if(member.getRoles().get(0).getColor() != null) {
+        if (member.getRoles().get(0).getColor() != null) {
             rolecolor = ChatColor.of("#" + Integer.toHexString(member.getRoles().get(0).getColor().getRGB()).substring(2));
-        }
-        else {
+        } else {
             rolecolor = ChatColor.WHITE;
         }
 

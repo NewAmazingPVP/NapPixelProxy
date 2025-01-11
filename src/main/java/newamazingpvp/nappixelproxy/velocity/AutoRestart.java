@@ -5,7 +5,6 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import java.time.Duration;
 import java.util.Calendar;
 import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 
 public class AutoRestart {
     private static final long[] warningTimes = {10, 7, 5, 3, 2, 1};

@@ -3,9 +3,8 @@ package newamazingpvp.nappixelproxy.discord;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.connection.Server;
-import net.md_5.bungee.api.event.*;
-import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.event.PlayerDisconnectEvent;
+import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
@@ -23,7 +22,7 @@ public class DiscordListeners implements Listener {
     @EventHandler
     public void onSwitch(ServerSwitchEvent event) {
         ProxiedPlayer player = event.getPlayer();
-        if(event.getFrom() == null){
+        if (event.getFrom() == null) {
             String s = player.getName() + " joined the network at " + event.getPlayer().getServer().getInfo().getName() + " server";
             sendDiscordEmbedPlayer(s, Color.GREEN, channelId, event.getPlayer().getName());
         } else {
@@ -61,13 +60,13 @@ public class DiscordListeners implements Listener {
                     String message = (String) dataObject.get("message");
                     String category = (String) dataObject.get("category");
                     String playerName = (String) dataObject.get("playerName");
-                    if(category.equals("death")){
+                    if (category.equals("death")) {
                         sendDiscordEmbedPlayer(message, Color.BLACK, channelId, playerName);
                     }
-                    if(category.equals("advancement")){
+                    if (category.equals("advancement")) {
                         sendDiscordEmbedPlayer(message, Color.ORANGE, channelId, playerName);
                     }
-                    if(category.equals("chat")){
+                    if (category.equals("chat")) {
                         sendWebhook(proxy.getProxy().getPlayer(playerName), message, proxy.getProxy().getPlayer(playerName).getServer().getInfo().getName());
                     }
                 } catch (ParseException e) {
