@@ -42,12 +42,6 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <relocations>
-                                <relocation>
-                                    <pattern>org.sqlite</pattern>
-                                    <shadedPattern>newamazingpvp.nappixelproxy.shaded.org.sqlite</shadedPattern>
-                                </relocation>
-                            </relocations>
                         </configuration>
                     </execution>
                 </executions>
@@ -98,11 +92,6 @@
             <groupId>club.minnced</groupId>
             <artifactId>discord-webhooks</artifactId>
             <version>0.8.4</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>2.13.4</version>
         </dependency>
         <dependency>
             <groupId>me.scarsz.jdaappender</groupId>
